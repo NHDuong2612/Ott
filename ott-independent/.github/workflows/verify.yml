@@ -1,0 +1,38 @@
+name: Verify tournament platform
+on: [push, pull_request]
+permissions:
+  contents: read
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  ARENA_PORT: '3000'
+  PUBLIC_ORIGIN: http://localhost:3000
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm test && npm run test:independent && npm run test:operations && npm run test:competition && npm run test:competition:api && npx tsc --noEmit
+      - run: npm audit --omit=dev
+      - run: npm run competition:init
+      - name: Allow the non-root container to read its worker secret
+        run: sudo chown 1000:1000 .secrets/judge-token
+      - run: docker compose up -d --build --wait
+      - name: Verify hostile Python in the real sandbox
+        run: docker compose run --rm -v "$PWD/tests:/app/tests:ro" -v "$PWD/public/bots:/app/public/bots:ro" judge node tests/judge.test.mjs
+      - run: npm run test:docker && npm run test:competition:e2e
+      - name: Show service diagnostics on failure
+        if: failure()
+        run: docker compose logs --tail 100
+      - name: Stop test services
+        if: always()
+        run: docker compose down

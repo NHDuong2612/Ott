@@ -1,0 +1,12 @@
+import { randomBytes } from 'node:crypto';
+import { mkdirSync, existsSync, readFileSync, writeFileSync, chownSync } from 'node:fs';
+mkdirSync('.secrets', { recursive: true, mode: 0o700 });
+mkdirSync('backups/local', { recursive: true });
+const passwordFile='.secrets/local-postgres-password',urlFile='.secrets/local-postgres-url',tokenFile='.secrets/local-judge-token';
+if (!existsSync(passwordFile)) writeFileSync(passwordFile,randomBytes(32).toString('hex'),{mode:0o600});
+const password=readFileSync(passwordFile,'utf8').trim();
+if (!/^[a-f0-9]{64}$/.test(password)) throw new Error('Unexpected local database secret format.');
+if (!existsSync(urlFile)) writeFileSync(urlFile,`postgresql://arena:${password}@db:5432/arena`,{mode:0o600});
+if (!existsSync(tokenFile)) writeFileSync(tokenFile,randomBytes(48).toString('base64url'),{mode:0o600});
+if (process.platform==='linux' && process.getuid?.()===0) for(const file of [urlFile,tokenFile])chownSync(file,1000,1000);
+console.log('Local secrets are ready. No cloud configuration or data was changed.');

@@ -1,0 +1,44 @@
+<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net; worker-src blob:; connect-src https://cdn.jsdelivr.net;"><title>Interactive Python sandbox</title></head><body><script>
+let worker,session,timer,workerURL;
+const runtime='https://cdn.jsdelivr.net/pyodide/v0.27.7/full/';
+const send=data=>parent.postMessage({...data,session},'*');
+function stop(error){clearTimeout(timer);worker?.terminate();if(workerURL)URL.revokeObjectURL(workerURL);worker=null;if(error)send({type:'error',error});}
+function limit(ms,message){clearTimeout(timer);timer=setTimeout(()=>stop(message),ms);}
+window.addEventListener('message',event=>{
+  if(event.source!==parent)return;
+  const data=event.data;
+  if(data.type==='init'&&!worker){
+    session=data.session;
+    const source=String.raw`
+      importScripts('https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js');
+      let py;
+      onmessage=async event=>{try{
+        if(event.data.type==='init'){
+          py=await loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/',stdout:()=>{},stderr:()=>{}});
+          postMessage({type:'runtime'});
+          py.globals.set('BOT_CODE',event.data.code);
+          await py.runPythonAsync("import json\n_bot_scope = {}\nexec(compile(BOT_CODE, 'bot.py', 'exec'), _bot_scope)\nassert callable(_bot_scope.get('choose_move')), 'File phải có choose_move(state).' ");
+          postMessage({type:'ready'});
+        }else if(event.data.type==='choose'){
+          py.globals.set('STATE_JSON',JSON.stringify(event.data.state));
+          const output=await py.runPythonAsync("json.dumps(_bot_scope['choose_move'](json.loads(STATE_JSON)))");
+          if(output.length>4096)throw new Error('Bot trả về quá nhiều dữ liệu.');
+          postMessage({type:'move',request:event.data.request,move:JSON.parse(output)});
+        }
+      }catch(error){postMessage({type:'error',error:String(error).slice(0,1000)});}};
+    `;
+    workerURL=URL.createObjectURL(new Blob([source],{type:'application/javascript'}));
+    worker=new Worker(workerURL);
+    worker.onmessage=e=>{
+      if(e.data.type==='runtime'){limit(5000,'Bot vượt giới hạn 5 giây khi khởi tạo.');send({type:'runtime'});return;}
+      clearTimeout(timer);send(e.data);if(e.data.type==='error')stop();
+    };
+    worker.onerror=()=>stop('Không tải được Python. Kiểm tra mạng rồi bắt đầu lại.');
+    limit(90000,'Quá thời gian tải Python. Kiểm tra kết nối rồi thử lại.');
+    worker.postMessage({type:'init',code:data.code});
+  }else if(data.type==='choose'&&data.session===session&&worker){
+    limit(2000,'Bot vượt giới hạn 2 giây cho một nước đi.');
+    worker.postMessage({type:'choose',state:data.state,request:data.request});
+  }
+});
+</script></body></html>
