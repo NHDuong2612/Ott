@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-22T17:37:43.8678034Z",
+  "title": "Tournament control desk",
+  "extensions": {
+    "breakpoints": [
+      {
+        "name": "tournament-compact",
+        "value": "1100px"
+      },
+      {
+        "name": "tournament-mobile",
+        "value": "700px"
+      }
+    ],
+    "shadows": [],
+    "motion": []
+  },
+  "components": [
+    {
+      "name": "Tournament primary action",
+      "kind": "button",
+      "description": "University-blue action used for creation, submission and publication; disabled controls retain their native disabled state.",
+      "html": "<button class=\"ds-tc-primary\">Tạo giải đấu mới</button>",
+      "css": ".ds-tc-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 14px/1.65 'Be Vietnam Pro',sans-serif;background:#034ea1;color:#ffffff;border:1px solid #034ea1;border-radius:8px;padding:9px 13px;min-height:42px;cursor:pointer}.ds-tc-primary:hover{background:#003f85}.ds-tc-primary:focus-visible{outline:3px solid #034ea1;outline-offset:3px}.ds-tc-primary:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Tournament neutral action",
+      "kind": "button",
+      "description": "Secondary operations use a white surface and thin border.",
+      "html": "<button class=\"ds-tc-secondary\">Xuất config</button>",
+      "css": ".ds-tc-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 14px/1.65 'Be Vietnam Pro',sans-serif;background:#fff;color:#172c44;border:1px solid #d7dacf;border-radius:8px;padding:9px 13px;min-height:42px;cursor:pointer}.ds-tc-secondary:hover{background:#e9eddf}.ds-tc-secondary:focus-visible{outline:3px solid #034ea1;outline-offset:3px}.ds-tc-secondary:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Tournament field",
+      "kind": "input",
+      "description": "Visible Vietnamese labels sit above white fields; code fields use JetBrains Mono.",
+      "html": "<label class=\"ds-tc-field\">Tên giải<input placeholder=\"Giải lập trình bot khoa CNTT\" /></label>",
+      "css": ".ds-tc-field{display:grid;gap:7px;font:550 13px/1.65 'Be Vietnam Pro',sans-serif;color:#172c44;margin:15px 0}.ds-tc-field input{font:400 14px/1.65 'Be Vietnam Pro',sans-serif;border:1px solid #bec4b6;background:#fff;border-radius:7px;padding:10px 12px;color:#172c44;min-width:0;caret-color:#4e712a}.ds-tc-field input::placeholder{color:#68735e;opacity:1}.ds-tc-field input:focus-visible{outline:3px solid #034ea1;outline-offset:3px}"
+    },
+    {
+      "name": "Tournament navigation",
+      "kind": "nav",
+      "description": "Midnight rail with lime selection; the mobile arrangement exposes two columns including the BTC entry for administrators.",
+      "html": "<nav class=\"ds-tc-nav\" aria-label=\"Giải đấu\"><button class=\"ds-tc-active\">Giải đấu</button><button>Bài nộp của đội</button><button>Lịch đấu &amp; replay</button><button>Ban tổ chức</button></nav>",
+      "css": ".ds-tc-nav{display:grid;gap:6px;padding:20px;background:#18221e}.ds-tc-nav button{display:flex;align-items:center;justify-content:flex-start;font:500 14px/1.65 'Be Vietnam Pro',sans-serif;color:#d5dfd2;background:transparent;border:0;border-radius:8px;padding:12px;min-height:42px;cursor:pointer}.ds-tc-nav button:hover{background:#2e3c31}.ds-tc-nav button.ds-tc-active{background:#034ea1;color:#ffffff}.ds-tc-nav button:focus-visible{outline:3px solid #034ea1;outline-offset:3px}@media(max-width:700px){.ds-tc-nav{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.ds-tc-nav button{font-size:11px;white-space:nowrap;padding:9px 10px;min-height:40px}}"
+    },
+    {
+      "name": "Tournament status",
+      "kind": "chip",
+      "description": "Noninteractive lifecycle label; meaning is expressed in Vietnamese text rather than color alone.",
+      "html": "<span class=\"ds-tc-status\">Đang nhận bài</span>",
+      "css": ".ds-tc-status{display:inline-block;font:650 11px/1.65 'Be Vietnam Pro',sans-serif;background:#e5edd9;color:#324d20;border-radius:4px;padding:3px 8px}"
+    },
+    {
+      "name": "Tournament event row",
+      "kind": "card",
+      "description": "A whole-row button opens a tournament; detailed standings and operational data use flat tables.",
+      "html": "<button class=\"ds-tc-event\"><span class=\"ds-tc-event-status\">Đang nhận bài</span><h2>Giải lập trình bot</h2><p>4 bảng · 2 suất đi tiếp mỗi bảng</p><span>Hạn nộp 24/10/2026</span></button>",
+      "css": ".ds-tc-event{display:block;width:100%;min-height:165px;text-align:left;font:400 14px/1.65 'Be Vietnam Pro',sans-serif;color:#172c44;background:#fff;border:1px solid #d7dacf;border-radius:12px;padding:27px;cursor:pointer}.ds-tc-event:hover{background:#e9eddf}.ds-tc-event:focus-visible{outline:3px solid #034ea1;outline-offset:3px}.ds-tc-event h2{font-size:22px;font-weight:650;line-height:1.3;letter-spacing:-.025em;margin:14px 0 15px}.ds-tc-event p{color:#596153;margin:10px 0 18px}.ds-tc-event>span:last-child{font-size:12px}.ds-tc-event-status{display:inline-block;font-size:11px;font-weight:650;background:#e5edd9;color:#324d20;border-radius:4px;padding:3px 8px}@media(max-width:700px){.ds-tc-event{padding:22px}.ds-tc-event h2{font-size:20px}}"
+    }
+  ],
+  "narrative": {
+    "overview": "The user delegated the visual direction. A warm ivory application shell, narrow midnight navigation rail, and ink-blue arena establish a calm workspace for long coding sessions. Citrus green marks actions and active play; coral identifies the opposing side. Solid fills, crisp edges, no gradients. Typography uses Be Vietnam Pro for Vietnamese content and JetBrains Mono for code and coordinates."
+  }
+}

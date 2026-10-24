@@ -1,0 +1,82 @@
+name: uet-arena-local
+services:
+  db:
+    image: postgres:18-bookworm
+    environment:
+      POSTGRES_USER: arena
+      POSTGRES_DB: arena
+      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+    volumes:
+      - local-postgres:/var/lib/postgresql
+      - ./.secrets/local-postgres-password:/run/secrets/db-password:ro
+      - ./backups/local:/backups
+    networks: [database]
+    mem_limit: 1g
+    cpus: 1
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U arena -d arena"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.local
+    image: uet-arena-app:local-postgres
+    init: true
+    ports:
+      - "${ARENA_BIND_ADDRESS:-127.0.0.1}:${ARENA_PORT:-3000}:3000"
+    environment:
+      PUBLIC_ORIGIN: "${PUBLIC_ORIGIN:-http://localhost:3000}"
+      DATABASE_URL_FILE: /run/secrets/database-url
+      DATABASE_DRIVER: pg
+      PG_POOL_MAX: "20"
+      JUDGE_TOKEN_FILE: /run/secrets/judge-token
+    volumes:
+      - ./.secrets/local-postgres-url:/run/secrets/database-url:ro
+      - ./.secrets/local-judge-token:/run/secrets/judge-token:ro
+    networks: [web, database, judge]
+    mem_limit: 2g
+    cpus: 2
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      start_period: 40s
+      retries: 12
+  judge:
+    build:
+      context: .
+      dockerfile: judge/Dockerfile
+    image: oan-tu-ti-judge:local
+    init: true
+    environment:
+      CONTROL_URL: http://app:3000
+      JUDGE_TOKEN_FILE: /run/secrets/judge-token
+    volumes:
+      - ./.secrets/local-judge-token:/run/secrets/judge-token:ro
+    networks: [judge]
+    read_only: true
+    tmpfs: ["/tmp:size=32m,noexec,nosuid"]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    mem_limit: 2g
+    cpus: 2
+    restart: unless-stopped
+    depends_on:
+      app: { condition: service_healthy }
+volumes:
+  local-postgres:
+networks:
+  web:
+  database:
+    internal: true
+  judge:
+    internal: true

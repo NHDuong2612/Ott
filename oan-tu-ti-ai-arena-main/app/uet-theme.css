@@ -1,0 +1,17 @@
+/* Shared UET–VNU identity, preserving the existing arena layout and game colors. */
+:root{--paper:#f5f7fa;--ink:#172c44;--muted:#596b80;--line:#dce3ed;--nav:#102b4d;--lime:#dceaff;--mint:#edf3fa}
+.brand{font-size:21px;letter-spacing:-.04em}
+.brand .uet-mark{font-size:13px;font-weight:800;letter-spacing:-.05em;background:transparent;color:#fff;border:1px solid #6e98c7;border-radius:7px}
+.sidebar{color:#c1d1e5}.brand span{color:#b9cce3}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline-color:#034ea1}
+::selection{background:#dceaff;color:#172c44}
+input,textarea{caret-color:#034ea1}
+.nav-item.active,.button.dark{background:#034ea1;color:#fff}
+.nav-item:hover{background:#1b3d65;color:#fff}
+.button.dark:hover{background:#003f85}
+.brand b{background:#28496f;color:#dceaff}
+.help-box{background:#1b3d65;color:#f5f8ff}
+.help-box button{color:#dceaff}
+.start-panel{background:#edf3fa}
+.step-num{background:#dceaff;color:#034ea1}
+.brand .uet-mark{transform:none}

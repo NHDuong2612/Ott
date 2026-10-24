@@ -1,0 +1,71 @@
+
+> ottv2-game@1.0.0 test
+> node tests/rules.test.js && node tests/multiplayer.test.js && node tests/renderSync.test.js && node tests/server.integration.test.js && node tests/server.timer.test.js && node tests/bot-auth.test.js && node tests/bot-platform-api.test.js && node tests/bot-database-failure.test.js && node tests/bot-hub.test.js && node tests/bot-source-archive.test.js && node tests/bot-protocol.test.js && node tests/bot-match.test.js && node tests/bot-render-sandbox.test.js && node tests/bot-worker-readiness.test.js && node tests/bot-replay.test.js && node tests/bot-schedule.test.js && node tests/bot-tournament-completion.test.js && node tests/bot-standings.test.js && node tests/bot-sample-seed.test.js && node tests/bot-samples.test.js && node tests/bot-job-picker.test.js && node tests/bot-qualifier-hub.test.js && node tests/bot-qualifiers.integration.test.js && node tests/bot-learning.test.js && node tests/bot-challenge-hub.test.js && node tests/bot-match-share.test.js && node tests/bot-worker-metrics.test.js && node tests/bot-admin-monitor-ui.test.js
+
+================================================================
+🧪 BẮT ĐẦU CHẠY BỘ KIỂM THỬ TÍNH ĐÚNG ĐẮN CỦA OTTv2 GAME ENGINE
+   Thành viên: Trần Văn Mạnh (Nhánh: manh)
+================================================================
+
+1. Kiểm tra chuyển đổi hệ tọa độ bàn cờ 9x9 (A1 - I9)...
+  ✓ Hệ tọa độ A1 <-> (x, y) chính xác 100%
+
+2. Kiểm tra di chuyển 1 ô theo 8 hướng (King's Move)...
+  ✓ Luật di chuyển quân Vua 8 hướng kiểm chứng thành công
+
+3. Kiểm tra quy tắc ăn quân Đấm-Lá-Kéo và luật cùng loại chặn đường...
+  ✓ Luật khắc chế và luật chặn đường hai quân cùng loại chuẩn xác 100%
+
+4. Kiểm tra khởi tạo bàn cờ ban đầu...
+  ✓ Khởi tạo cân đối: P1 (15 quân) vs P2 (15 quân)
+
+5. Kiểm tra tính hợp lệ của nước đi và chặn đường trên bàn cờ...
+  ✓ Kiểm tra tương tác bàn cờ thực tế hoàn toàn chính xác
+
+6. Kiểm tra ăn sạch một loại quân không kết thúc ván đấu...
+  ✓ Ăn quân không tự động kết thúc ván đấu
+
+7. Kiểm tra P1 tới I1 và P2 tới A9...
+  ✓ Phát hiện điều kiện thắng chiếm ô đích chuẩn xác
+
+8. Kiểm tra AI Engine với 3 cấp độ tư duy (Easy, Medium, Hard)...
+  ✓ Cả 3 cấp độ AI (Easy / Medium / Hard) khởi tạo và sinh nước đi hợp lệ 100%
+
+9. Kiểm tra Bảng Chuyển Vị trong RAM máy tính (Transposition Table Cache & Telemetry)...
+  ✓ Đã lưu 348 thế cờ vào RAM (~44 KB). Đạt chuẩn bộ nhớ tư duy O(1)!
+
+10. Kiểm tra AI phát hiện nước đi chiến thắng tức thì ở A9...
+  ✓ AI phát hiện và thực hiện ngay nước đi chiến thắng vào cứ điểm A9
+
+11. Kiểm tra khởi tạo bàn cờ tùy chọn với đội hình tự chọn tối đa 9 quân (createCustomBoard)...
+  ✓ Bàn cờ tùy biến dàn trận khởi tạo chính xác theo tọa độ và phân bổ loại quân
+
+12. Kiểm tra thuật toán tự động sinh dàn trận cho AI (generateAiDraftPlacement)...
+  ✓ Đội hình AI sinh ngẫu nhiên đủ 9 quân (3 Đấm, 3 Lá, 3 Kéo) trên nửa sân không trùng lặp và không chặn I1
+
+================================================================
+🎉 TẤT CẢ 12/12 BÀI TEST ĐỀU VƯỢT QUA XUẤT SẮC (100% PASS)!
+================================================================
+
+✓ Multiplayer room roles and PlayHTML sync passed
+✓ Joining from a link waits for connection and keeps spectator role
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: server should start
+    at file:///D:/VNU/year3/NetwotkProgramming/network-programming/tests/server.integration.test.js:66:10 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.19.0
+npm notice
+npm notice New major version of npm available! 11.17.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

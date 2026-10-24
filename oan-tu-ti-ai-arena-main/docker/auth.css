@@ -1,0 +1,44 @@
+* { box-sizing: border-box; }
+:root { font-family: "Be Vietnam Pro", system-ui, sans-serif; color: #172c44; background: #f5f7fa; font-synthesis: none; }
+body { margin: 0; }
+a { color: inherit; text-underline-offset: 4px; }
+::selection { color: #172c44; background: #dceaff; }
+:focus-visible { outline: 3px solid #034ea1; outline-offset: 4px; }
+header { height: 88px; display: flex; align-items: center; justify-content: space-between; padding: 0 6vw; border-bottom: 1px solid #d6dfe9; }
+.brand { font-size: 27px; font-weight: 750; letter-spacing: -.03em; text-decoration: none; }
+.brand span { font-size: 11px; letter-spacing: 0; background: #e2ecf9; padding: 5px 7px; border-radius: 4px; vertical-align: middle; margin-left: 5px; }
+.back { font-size: 13px; text-decoration: none; display: flex; gap: 20px; }
+.back:hover, .switch a:hover { color: #034ea1; }
+main { max-width: 1450px; margin: 0 auto; min-height: calc(100svh - 88px); display: grid; grid-template-columns: 1fr 1fr; }
+.intro { margin: 44px 0 44px 5vw; padding: 48px 40px 26px; background: #102b4d; border-radius: 16px; color: #f5f8ff; display: flex; flex-direction: column; }
+h1 { font-size: 36px; line-height: 1.35; letter-spacing: -.03em; font-weight: 600; margin: 0 0 16px; }
+.intro > p { color: #c6d7eb; line-height: 1.9; font-size: 14px; max-width: 38ch; margin: 0; }
+.board-emblem { position: relative; width: 260px; height: 245px; align-self: center; margin: 25px 0; }
+.board-emblem > span { width: 96px; height: 96px; position: absolute; border-radius: 18px; display: grid; place-items: center; }
+.rock { top: 14px; left: 19px; background: #cee9a4; transform: rotate(-12deg); }
+.rock:after { content: ""; width: 43px; height: 43px; border: 3px solid #294932; clip-path: polygon(25% 0,75% 0,100% 25%,100% 75%,75% 100%,25% 100%,0 75%,0 25%); background: #294932; }
+.paper { top: 67px; right: 12px; background: #f3f5df; transform: rotate(9deg); }
+.paper:after { content: ""; width: 37px; height: 47px; border: 3px solid #294932; border-radius: 4px; }
+.scissors { left: 49px; bottom: 5px; background: #eaaa91; color: #693f2f; transform: rotate(-4deg); }
+.scissors svg { width: 53px; height: 53px; }
+.goals { margin-top: auto; padding-top: 22px; border-top: 1px solid #476483; display: flex; justify-content: space-between; gap: 12px; font-size: 11px; color: #c6d7eb; }
+.form-side { display: flex; align-items: center; padding: 45px 5vw; }
+.form-wrap { width: 100%; max-width: 410px; margin: auto; }
+h2 { font-size: 29px; line-height: 1.35; letter-spacing: -.025em; margin: 0 0 14px; font-weight: 650; }
+.lead { color: #52657b; font-size: 14px; line-height: 1.8; margin: 0 0 30px; }
+form { display: grid; gap: 19px; }
+label { display: grid; gap: 8px; font-size: 13px; font-weight: 600; }
+input { width: 100%; padding: 13px 14px; border: 1px solid #b8c8da; background: #fff; border-radius: 7px; color: #172c44; font: inherit; font-weight: 400; caret-color: #034ea1; }
+input:hover { border-color: #034ea1; }
+input:focus { border-color: #034ea1; }
+.field-help { color: #52657b; font-size: 12px; line-height: 1.7; margin: -10px 0 0; }
+button { border: 0; border-radius: 7px; color: #f5f8ee; background: #034ea1; padding: 14px 17px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 150ms; }
+button:hover { background: #003f85; }
+button:active { background: #00356f; }
+.error { padding: 13px 16px; background: #f7e5dc; color: #883c2b; border-radius: 7px; line-height: 1.7; font-size: 13px; margin-bottom: 22px; overflow-wrap: anywhere; }
+.switch { font-size: 13px; color: #52657b; margin: 25px 0 0; }
+.switch a { font-weight: 650; color: #034ea1; margin-left: 5px; }
+.account-note { font-size: 11px; color: #52657b; margin: 30px 0 0; padding-top: 20px; border-top: 1px solid #d6dfe9; line-height: 1.8; }
+.logout-copy { font-size: 14px; line-height: 1.8; margin: 0 0 4px; }
+@media (max-width: 850px) { .intro { margin-left: 24px; padding: 35px 25px 25px; } h1 { font-size: 28px; } .goals span:nth-child(2) { display: none; } .form-side { padding: 40px 28px; } h2 { font-size: 26px; } }
+@media (max-width: 620px) { header { height: 72px; padding: 0 22px; } .brand { font-size: 23px; } .back { font-size: 11px; gap: 8px; } main { grid-template-columns: 1fr; min-height: calc(100svh - 72px); } .intro { display: none; } .form-side { padding: 42px 26px; align-items: flex-start; } .form-wrap { margin-top: 0; } h2 { font-size: 28px; } }

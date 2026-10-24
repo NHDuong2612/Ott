@@ -1,0 +1,9 @@
+.bot-library { margin-bottom: 24px; }
+.bot-library .section-heading p { color: #5d6e53; font-size: 12px; line-height: 1.8; margin: 8px 0 0; }
+.example-bot { display: flex; align-items: center; gap: 16px; padding: 18px 24px; border-top: 1px solid var(--line); }
+.example-bot > div { flex: 1; }
+.example-bot h3 { font-size: 14px; margin: 0 0 6px; }
+.example-bot p { color: #5d6e53; font-size: 12px; line-height: 1.8; margin: 0; }
+.example-bot .button { flex-shrink: 0; }
+.example-bot a { display: grid; place-items: center; }
+@media (max-width: 620px) { .example-bot { flex-wrap: wrap; padding: 18px; gap: 12px; } .example-bot > div { flex-basis: 100%; } .bot-library .section-heading { padding: 18px; } }

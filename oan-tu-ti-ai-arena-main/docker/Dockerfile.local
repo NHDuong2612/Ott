@@ -1,0 +1,22 @@
+FROM node:22-bookworm-slim AS build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY . .
+ENV ARENA_DEPLOYMENT=local-postgres NEXT_PUBLIC_LOCAL_RUNTIME=1 NEXT_TELEMETRY_DISABLED=1
+RUN node scripts/vendor-pyodide.mjs
+RUN node node_modules/next/dist/bin/next build --webpack
+
+FROM node:22-bookworm-slim
+WORKDIR /app
+ENV NODE_ENV=production ARENA_DEPLOYMENT=local-postgres DATABASE_DRIVER=pg NEXT_TELEMETRY_DISABLED=1 HOSTNAME=0.0.0.0 PORT=3000
+COPY --from=build --chown=node:node /app/.next-local/standalone ./
+COPY --from=build --chown=node:node /app/.next-local/static ./.next-local/static
+COPY --from=build --chown=node:node /app/public ./public
+COPY --chown=node:node deploy/vercel-schema.sql deploy/competition-schema.sql ./deploy/
+COPY --chown=node:node docker/local-start.mjs ./docker/local-start.mjs
+COPY --chown=node:node docker/auth.css ./docker/auth.css
+COPY --chown=node:node scripts/local-admin.mjs ./scripts/local-admin.mjs
+USER node
+EXPOSE 3000
+CMD ["node", "docker/local-start.mjs"]

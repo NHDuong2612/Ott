@@ -1,0 +1,23 @@
+services:
+  app:
+    environment:
+      PUBLIC_ORIGIN: "https://${ARENA_DOMAIN:?Set ARENA_DOMAIN to your domain}"
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      ARENA_DOMAIN: "${ARENA_DOMAIN:?Set ARENA_DOMAIN to your domain}"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+volumes:
+  caddy-data:
+  caddy-config:
