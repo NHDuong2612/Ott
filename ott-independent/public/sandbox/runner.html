@@ -1,0 +1,91 @@
+<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net; worker-src blob:; connect-src https://cdn.jsdelivr.net;"><title>Isolated Python runner</title></head><body><script>
+const runtime='https://cdn.jsdelivr.net/pyodide/v0.27.7/full/';
+let active;
+window.addEventListener('message',async event=>{
+  if(event.source!==parent||event.data?.type!=='run'||active)return;
+  const {code,opponent,runId}=event.data;
+  const send=data=>parent.postMessage({...data,runId},'*');
+  const script=`
+    importScripts('${runtime}pyodide.js');
+    onmessage=async e=>{try{
+      const py=await loadPyodide({indexURL:'${runtime}',stdout:()=>{},stderr:()=>{}});
+      postMessage({type:'ready'});
+      py.globals.set('BOT_CODE',e.data.code);py.globals.set('OPPONENT',e.data.opponent);
+      const result=await py.runPythonAsync(e.data.engine);
+      postMessage({type:'result',replay:JSON.parse(result)});
+    }catch(error){postMessage({type:'error',error:String(error).slice(0,1200)});}};
+  `;
+  const workerURL=URL.createObjectURL(new Blob([script],{type:'application/javascript'}));
+  const worker=new Worker(workerURL); active=worker;
+  let timer=setTimeout(()=>{worker.terminate();active=null;send({type:'error',error:'Quá thời gian tải Python. Kiểm tra mạng rồi thử lại.'});},90000);
+  const engine=await fetchEngine();
+  worker.onmessage=e=>{
+    if(e.data.type==='ready'){clearTimeout(timer);timer=setTimeout(()=>{worker.terminate();active=null;send({type:'error',error:'Bot vượt giới hạn 15 giây. Hãy kiểm tra vòng lặp.'});},15000);send({type:'ready'});return;}
+    clearTimeout(timer);worker.terminate();URL.revokeObjectURL(workerURL);active=null;send(e.data);
+  };
+  worker.onerror=()=>{clearTimeout(timer);worker.terminate();active=null;send({type:'error',error:'Không tải được Python runtime. Kiểm tra kết nối tới jsDelivr.'});};
+  worker.postMessage({code,opponent,engine});
+});
+function fetchEngine(){return Promise.resolve(ENGINE);}
+const ENGINE=String.raw`
+import json, random, copy
+random.seed(42)
+board=[[None for _ in range(9)] for _ in range(9)]
+types=['ROCK','PAPER','SCISSORS']
+for x in range(1,8): board[0][x]={'player':'P2','type':types[(x-1)%3]}
+for x in range(8): board[1][x]={'player':'P2','type':types[(x+1)%3]}
+for x in range(1,9): board[7][x]={'player':'P1','type':['SCISSORS','PAPER','ROCK'][(x-1)%3]}
+for x in range(1,8): board[8][x]={'player':'P1','type':['ROCK','SCISSORS','PAPER'][(x-1)%3]}
+beats={'ROCK':'SCISSORS','PAPER':'ROCK','SCISSORS':'PAPER'}
+def coord(x,y): return chr(65+x)+str(y+1)
+def pos(c): return ord(c[0])-65,int(c[1])-1
+def legal(player):
+    moves=[]
+    for y in range(9):
+        for x in range(9):
+            p=board[y][x]
+            if not p or p['player']!=player: continue
+            for dy in [-1,0,1]:
+                for dx in [-1,0,1]:
+                    xx,yy=x+dx,y+dy
+                    if (dx==0 and dy==0) or not (0<=xx<9 and 0<=yy<9): continue
+                    target=board[yy][xx]
+                    if target and (target['player']==player or beats[p['type']]!=target['type']): continue
+                    moves.append({'from':coord(x,y),'to':coord(xx,yy)})
+    return moves
+scope={}
+exec(compile(BOT_CODE,'bot.py','exec'),scope)
+choose=scope.get('choose_move')
+if not callable(choose): raise ValueError('File phải có hàm choose_move(state).')
+moves=[]
+winner=None
+reason='max_plies'
+error=None
+for ply in range(200):
+    player='P1' if ply%2==0 else 'P2'
+    options=legal(player)
+    if not options:
+        winner='P2' if player=='P1' else 'P1';reason='no_moves';break
+    if player=='P1':
+        try:
+            move=choose({'board':copy.deepcopy(board),'player':player,'legal_moves':copy.deepcopy(options),'turn':ply,'history':copy.deepcopy(moves)})
+            if not isinstance(move,dict) or {'from':move.get('from'),'to':move.get('to')} not in options: raise ValueError('Nước đi không hợp lệ: '+str(move)[:100])
+        except Exception as exc:
+            winner='P2';reason='error';error=str(exc)[:1000];break
+    else:
+        if OPPONENT=='random': move=random.choice(options)
+        else:
+            def score(m):
+                x,y=pos(m['from']);xx,yy=pos(m['to'])
+                return (max(x,8-y)-max(xx,8-yy))*5+(8 if board[yy][xx] else 0)+(1000 if m['to']=='A9' else 0)
+            move=max(options,key=score)
+    x,y=pos(move['from']);xx,yy=pos(move['to'])
+    capture=board[yy][xx]
+    board[yy][xx]=board[y][x];board[y][x]=None
+    step={'from':move['from'],'to':move['to'],'player':player,'capture':capture['type'] if capture else None}
+    moves.append(step)
+    if move['to']==('I1' if player=='P1' else 'A9'):
+        winner=player;reason='goal';break
+json.dumps({'moves':moves,'winner':winner,'reason':reason,'error':error,'seed':42,'engine':'ott-board-1.0'})
+`;
+</script></body></html>

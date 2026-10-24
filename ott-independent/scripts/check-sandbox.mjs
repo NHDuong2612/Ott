@@ -1,0 +1,10 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+import {spawnSync} from 'node:child_process';
+const html=readFileSync('public/sandbox/runner.html','utf8');
+const match=/const ENGINE=String.raw`([\s\S]*?)`;/m.exec(html);if(!match)throw new Error('Missing Python engine');
+const code=`def choose_move(state):\n    return state['legal_moves'][0]\n`;
+const script=`BOT_CODE=${JSON.stringify(code)}\nOPPONENT='random'\n`+match[1].replace("json.dumps({'moves'","print(json.dumps({'moves'").trim()+')\n';
+writeFileSync('.sites-runtime/sandbox-check.py',script);
+const python=process.env.OTT_PYTHON||'python';
+const r=spawnSync(python,['.sites-runtime/sandbox-check.py'],{encoding:'utf8',timeout:15000});
+if(r.status!==0)throw new Error(r.stderr);const replay=JSON.parse(r.stdout);const {verifyReplay}=await import('../lib/engine.mjs');verifyReplay(replay);console.log('Python runner produces a replay valid under the original JavaScript rules.');

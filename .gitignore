@@ -1,0 +1,34 @@
+# Dependencies and generated output in either application directory.
+node_modules/
+.next/
+.next-vercel/
+.next-docker/
+.next-local/
+.vinext/
+.wrangler/
+dist/
+out/
+*.tsbuildinfo
+__pycache__/
+*.pyc
+
+# Local credentials and databases must stay outside Git.
+.env*
+.secrets/
+.vercel/
+.vercel-global/
+*.pem
+*.db
+*.sqlite
+*.sqlite3
+
+# Local tool state, reports and backups.
+.agents/
+.codex/
+.sites-runtime/
+work/
+outputs/
+output/
+tmp/
+backups/
+*.tar.gz

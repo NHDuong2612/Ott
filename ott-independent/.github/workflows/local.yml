@@ -1,0 +1,53 @@
+name: Verify full local PostgreSQL deployment
+on: [push, pull_request]
+permissions:
+  contents: read
+concurrency:
+  group: local-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  ARENA_PORT: '3000'
+  PUBLIC_ORIGIN: http://localhost:3000
+jobs:
+  local:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run local:init
+      - name: Allow the non-root app and judge to read local secrets
+        run: sudo chown 1000:1000 .secrets/local-postgres-url .secrets/local-judge-token
+      - run: docker compose -f compose.local.yaml up -d --build --wait
+      - name: Verify registration, concurrent submission and a real tournament
+        env:
+          ARENA_ALLOW_LOCAL_SMOKE: '1'
+          ARENA_LOCAL_TEST_ORIGIN: http://localhost:3000
+        run: node tests/vnu-cloud-smoke.test.mjs
+      - name: Verify PostgreSQL transactions, leases and frozen results
+        run: docker compose -f compose.local.yaml run --rm --no-deps -v "$PWD:/workspace" -w /workspace app node tests/competition-postgres.test.mjs
+      - name: Verify profiles, bot storage, friend rooms and account isolation
+        env:
+          OTT_DOCKER_URL: http://localhost:3000
+          OTT_DOCKER_RESTART: '0'
+        run: node tests/docker.test.mjs
+      - name: Verify 4000 total submissions at concurrency 64
+        run: docker compose -f compose.local.yaml run --rm --no-deps -e SUBMISSION_TEST_TOTAL=4000 -e SUBMISSION_TEST_CONCURRENCY=64 -e SUBMISSION_TEST_REPORT=/tmp/submission-load.json -v "$PWD:/workspace" -w /workspace app node tests/submission-concurrency.test.mjs
+      - name: Verify operation with app Internet disconnected
+        env:
+          ARENA_ALLOW_OFFLINE_TEST: '1'
+        run: node tests/local-offline.test.mjs
+      - name: Verify backup restoration in a disposable database
+        run: node tests/local-backup.test.mjs
+      - name: Show service diagnostics on failure
+        if: failure()
+        run: docker compose -f compose.local.yaml logs --tail 60
+      - name: Stop test services and retain no runner resources
+        if: always()
+        run: docker compose -f compose.local.yaml down
